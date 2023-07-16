@@ -24,6 +24,52 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+app.get("/api/", (req, res) => {
+  const dateTimeStamp = Date.now();
+  const dateUTC = new Date(dateTimeStamp).toUTCString();
+  const jsonToPost = {};
+  jsonToPost.unix = dateTimeStamp;
+  jsonToPost.utc = dateUTC;
+  res.json(jsonToPost);
+})
+
+app.get("/api/:date", (req, res) => {
+  const dateReq = req.params.date;
+  const dateObj = new Date(dateReq);
+  const jsonToPost = {}
+  const unixDateRegex = /^(\d{1,13})?$/gm;
+
+  //console.log(dateReq.match(unixDateRegex));
+
+  if (dateReq.match(unixDateRegex)) {
+    const dateUTC = new Date(parseInt(dateReq)).toUTCString();
+    //console.log(dateUTC);
+    jsonToPost.unix = parseInt(dateReq);
+    jsonToPost.utc = dateUTC;
+  } else if (dateObj.toString() !== "Invalid Date") {
+    //const dateObj = new Date(dateReq);
+    jsonToPost.unix = Math.floor(dateObj.getTime());
+    jsonToPost.utc = dateObj.toUTCString();
+  } else {
+    jsonToPost.error = "Invalid Date";
+  }
+  
+  /*
+  if (dateObj.toString() === "Invalid Date") {
+    console.log("attention la date est invalide!!!");
+    jsonToPost.error = "Invalid Date";
+  } else {
+    jsonToPost.unix = Math.floor(dateObj.getTime());
+    jsonToPost.utc = dateObj.toUTCString();
+  }*/
+  
+  res.json(jsonToPost);
+});
+
+app.get("/:word/echo", (req, res) => {
+  console.log(req.params.word);
+  res.json({echo: req.params.word});
+});
 
 
 // listen for requests :)
